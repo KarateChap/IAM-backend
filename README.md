@@ -81,8 +81,7 @@ JWT_EXPIRES_IN=24h
 DB_DIALECT=sqlite
 DB_STORAGE=:memory:
 
-# CORS Configuration
-FRONTEND_URL=http://localhost:5176
+FRONTEND_URL=http://localhost:5173
 ```
 
 ### 3. Development Server
@@ -272,7 +271,6 @@ The system includes comprehensive test coverage:
 ### Test Categories
 
 - **Unit Tests**: Controllers, Services, Middlewares, Utils
-- **Integration Tests**: API endpoints with real database
 - **Validation Tests**: Input validation scenarios
 - **Error Handling Tests**: Error scenarios and edge cases
 
