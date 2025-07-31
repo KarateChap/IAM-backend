@@ -1,0 +1,856 @@
+{
+	"info": {
+		"_postman_id": "iam-system-complete-2024",
+		"name": "IAM System - Complete API Collection",
+		"description": "Complete API collection for the IAM (Identity and Access Management) system with all CRUD operations, authentication, and relationship management endpoints.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"exec": [
+					"// Auto-set base URL if not set",
+					"if (!pm.collectionVariables.get('base_url')) {",
+					"    pm.collectionVariables.set('base_url', 'http://localhost:3000/api');",
+					"}"
+				],
+				"type": "text/javascript"
+			}
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.token) {",
+									"        pm.collectionVariables.set('jwt_token', response.token);",
+									"        console.log('JWT token saved:', response.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"TestPass123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new user account"
+					}
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.token) {",
+									"        pm.collectionVariables.set('jwt_token', response.token);",
+									"        console.log('JWT token saved:', response.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login with existing user credentials (Default admin: admin@example.com / Admin123!)"
+					}
+				}
+			],
+			"description": "Authentication endpoints for user registration and login"
+		},
+		{
+			"name": "👤 Users Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users?limit=10&offset=0&sortBy=createdAt&order=DESC",
+							"host": ["{{base_url}}"],
+							"path": ["users"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all users with optional filtering and pagination"
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": ["{{base_url}}"],
+							"path": ["users", "1"]
+						},
+						"description": "Get a specific user by ID"
+					}
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"NewUser123!\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						},
+						"description": "Create a new user"
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/2",
+							"host": ["{{base_url}}"],
+							"path": ["users", "2"]
+						},
+						"description": "Update an existing user"
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/2",
+							"host": ["{{base_url}}"],
+							"path": ["users", "2"]
+						},
+						"description": "Delete a user"
+					}
+				}
+			],
+			"description": "User management CRUD operations"
+		},
+		{
+			"name": "👥 Groups Management",
+			"item": [
+				{
+					"name": "Get All Groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/groups?limit=10&offset=0",
+							"host": ["{{base_url}}"],
+							"path": ["groups"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Get all groups with optional filtering"
+					}
+				},
+				{
+					"name": "Get Group by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/groups/1",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "1"]
+						},
+						"description": "Get a specific group by ID"
+					}
+				},
+				{
+					"name": "Create Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Developers\",\n  \"description\": \"Software development team\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/groups",
+							"host": ["{{base_url}}"],
+							"path": ["groups"]
+						},
+						"description": "Create a new group"
+					}
+				},
+				{
+					"name": "Update Group",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Senior Developers\",\n  \"description\": \"Senior software development team\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/groups/2",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "2"]
+						},
+						"description": "Update an existing group"
+					}
+				},
+				{
+					"name": "Delete Group",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/groups/2",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "2"]
+						},
+						"description": "Delete a group"
+					}
+				}
+			],
+			"description": "Group management CRUD operations"
+		},
+		{
+			"name": "🎭 Roles Management",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": ["{{base_url}}"],
+							"path": ["roles"]
+						},
+						"description": "Get all roles"
+					}
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles/1",
+							"host": ["{{base_url}}"],
+							"path": ["roles", "1"]
+						},
+						"description": "Get a specific role by ID"
+					}
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Developer\",\n  \"description\": \"Software developer role with limited permissions\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": ["{{base_url}}"],
+							"path": ["roles"]
+						},
+						"description": "Create a new role"
+					}
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Senior Developer\",\n  \"description\": \"Senior software developer role\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/2",
+							"host": ["{{base_url}}"],
+							"path": ["roles", "2"]
+						},
+						"description": "Update an existing role"
+					}
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles/2",
+							"host": ["{{base_url}}"],
+							"path": ["roles", "2"]
+						},
+						"description": "Delete a role"
+					}
+				}
+			],
+			"description": "Role management CRUD operations"
+		},
+		{
+			"name": "📦 Modules Management",
+			"item": [
+				{
+					"name": "Get All Modules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/modules",
+							"host": ["{{base_url}}"],
+							"path": ["modules"]
+						},
+						"description": "Get all modules"
+					}
+				},
+				{
+					"name": "Get Module by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/modules/1",
+							"host": ["{{base_url}}"],
+							"path": ["modules", "1"]
+						},
+						"description": "Get a specific module by ID"
+					}
+				},
+				{
+					"name": "Create Module",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Projects\",\n  \"description\": \"Project management module\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/modules",
+							"host": ["{{base_url}}"],
+							"path": ["modules"]
+						},
+						"description": "Create a new module"
+					}
+				},
+				{
+					"name": "Update Module",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Project Management\",\n  \"description\": \"Advanced project management module\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/modules/7",
+							"host": ["{{base_url}}"],
+							"path": ["modules", "7"]
+						},
+						"description": "Update an existing module"
+					}
+				},
+				{
+					"name": "Delete Module",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/modules/7",
+							"host": ["{{base_url}}"],
+							"path": ["modules", "7"]
+						},
+						"description": "Delete a module"
+					}
+				}
+			],
+			"description": "Module management CRUD operations"
+		},
+		{
+			"name": "🔑 Permissions Management",
+			"item": [
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/permissions?limit=50",
+							"host": ["{{base_url}}"],
+							"path": ["permissions"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Get all permissions"
+					}
+				},
+				{
+					"name": "Get Permission by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/permissions/1",
+							"host": ["{{base_url}}"],
+							"path": ["permissions", "1"]
+						},
+						"description": "Get a specific permission by ID"
+					}
+				},
+				{
+					"name": "Create Permission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Projects.create\",\n  \"description\": \"Create new projects\",\n  \"action\": \"create\",\n  \"moduleId\": 7,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["permissions"]
+						},
+						"description": "Create a new permission"
+					}
+				},
+				{
+					"name": "Update Permission",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Projects.create\",\n  \"description\": \"Create and manage new projects\",\n  \"action\": \"create\",\n  \"moduleId\": 7,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/permissions/25",
+							"host": ["{{base_url}}"],
+							"path": ["permissions", "25"]
+						},
+						"description": "Update an existing permission"
+					}
+				},
+				{
+					"name": "Delete Permission",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/permissions/25",
+							"host": ["{{base_url}}"],
+							"path": ["permissions", "25"]
+						},
+						"description": "Delete a permission"
+					}
+				}
+			],
+			"description": "Permission management CRUD operations"
+		},
+		{
+			"name": "🔗 User-Group Assignments",
+			"item": [
+				{
+					"name": "Assign Users to Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userIds\": [2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/groups/1/users",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "1", "users"]
+						},
+						"description": "Assign multiple users to a group"
+					}
+				},
+				{
+					"name": "Get Users in Group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/groups/1/users",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "1", "users"]
+						},
+						"description": "Get all users in a specific group"
+					}
+				},
+				{
+					"name": "Remove User from Group",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/groups/1/users/2",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "1", "users", "2"]
+						},
+						"description": "Remove a user from a group"
+					}
+				},
+				{
+					"name": "Get User's Groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1/groups",
+							"host": ["{{base_url}}"],
+							"path": ["users", "1", "groups"]
+						},
+						"description": "Get all groups that a user belongs to"
+					}
+				}
+			],
+			"description": "User-Group relationship management"
+		},
+		{
+			"name": "🎭 Group-Role Assignments",
+			"item": [
+				{
+					"name": "Assign Roles to Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roleIds\": [2]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/groups/2/roles",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "2", "roles"]
+						},
+						"description": "Assign roles to a group"
+					}
+				},
+				{
+					"name": "Get Roles in Group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/groups/1/roles",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "1", "roles"]
+						},
+						"description": "Get all roles assigned to a group"
+					}
+				},
+				{
+					"name": "Remove Role from Group",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/groups/2/roles/2",
+							"host": ["{{base_url}}"],
+							"path": ["groups", "2", "roles", "2"]
+						},
+						"description": "Remove a role from a group"
+					}
+				},
+				{
+					"name": "Get Role's Groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles/1/groups",
+							"host": ["{{base_url}}"],
+							"path": ["roles", "1", "groups"]
+						},
+						"description": "Get all groups that have a specific role"
+					}
+				}
+			],
+			"description": "Group-Role relationship management"
+		},
+		{
+			"name": "🔑 Role-Permission Assignments",
+			"item": [
+				{
+					"name": "Assign Permissions to Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"permissionIds\": [1, 2, 3, 4]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/2/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["roles", "2", "permissions"]
+						},
+						"description": "Assign permissions to a role"
+					}
+				},
+				{
+					"name": "Get Permissions in Role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles/1/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["roles", "1", "permissions"]
+						},
+						"description": "Get all permissions assigned to a role"
+					}
+				},
+				{
+					"name": "Remove Permission from Role",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles/2/permissions/1",
+							"host": ["{{base_url}}"],
+							"path": ["roles", "2", "permissions", "1"]
+						},
+						"description": "Remove a permission from a role"
+					}
+				},
+				{
+					"name": "Get Permission's Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/permissions/1/roles",
+							"host": ["{{base_url}}"],
+							"path": ["permissions", "1", "roles"]
+						},
+						"description": "Get all roles that have a specific permission"
+					}
+				}
+			],
+			"description": "Role-Permission relationship management"
+		},
+		{
+			"name": "🛡️ Access Control",
+			"item": [
+				{
+					"name": "Get My Permissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/me/permissions",
+							"host": ["{{base_url}}"],
+							"path": ["me", "permissions"]
+						},
+						"description": "Get all permissions for the currently authenticated user"
+					}
+				},
+				{
+					"name": "Simulate Action",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 1,\n  \"moduleId\": 1,\n  \"action\": \"create\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/simulate-action",
+							"host": ["{{base_url}}"],
+							"path": ["simulate-action"]
+						},
+						"description": "Test if a specific user can perform an action on a module. Requires userId, moduleId, and action in request body."
+					}
+				}
+			],
+			"description": "Access control and permission checking endpoints"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
