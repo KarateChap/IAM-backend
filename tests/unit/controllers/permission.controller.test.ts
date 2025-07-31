@@ -51,6 +51,7 @@ describe('Permission Controller', () => {
             description: 'Description 1',
             action: 'create' as const,
             moduleId: 1,
+            isActive: true,
             module: { id: 1, name: 'Module 1' },
             createdAt: new Date(),
             updatedAt: new Date()
@@ -61,6 +62,7 @@ describe('Permission Controller', () => {
             description: 'Description 2',
             action: 'read' as const,
             moduleId: 1,
+            isActive: true,
             module: { id: 1, name: 'Module 1' },
             createdAt: new Date(),
             updatedAt: new Date()
@@ -108,6 +110,7 @@ describe('Permission Controller', () => {
           description: 'Test Description',
           action: 'create' as const,
           moduleId: 1,
+          isActive: true,
           module: { id: 1, name: 'Module 1' },
           createdAt: new Date(),
           updatedAt: new Date()
@@ -158,6 +161,7 @@ describe('Permission Controller', () => {
         description: 'Test Description',
         action: 'create' as const,
         moduleId: 1,
+        isActive: true,
         module: { id: 1, name: 'Module 1' },
         createdAt: new Date(),
         updatedAt: new Date()
@@ -212,6 +216,7 @@ describe('Permission Controller', () => {
         description: 'Test Description',
         action: 'create' as const,
         moduleId: 1,
+        isActive: true,
         module: { id: 1, name: 'Module 1' },
         createdAt: new Date(),
         updatedAt: new Date()
@@ -276,6 +281,7 @@ describe('Permission Controller', () => {
         description: 'Test Description',
         action: 'create' as const,
         moduleId: 1,
+        isActive: true,
         module: { id: 1, name: 'Module 1' },
         createdAt: new Date(),
         updatedAt: new Date()
@@ -303,6 +309,7 @@ describe('Permission Controller', () => {
         description: 'Updated Description',
         action: 'update' as const,
         moduleId: 1,
+        isActive: true,
         module: { id: 1, name: 'Module 1' },
         createdAt: new Date(),
         updatedAt: new Date()
@@ -372,6 +379,7 @@ describe('Permission Controller', () => {
         description: 'Test Description',
         action: 'create' as const,
         moduleId: 1,
+        isActive: true,
         module: { id: 1, name: 'Module 1' },
         createdAt: new Date(),
         updatedAt: new Date()

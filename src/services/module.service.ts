@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { Module } from '../models/module.model';
 import { Permission } from '../models/permission.model';
+import { RolePermission } from '../models/rolePermission.model';
 import { NotFoundError, ConflictError, ValidationError } from '../utils/errors';
 
 export interface CreateModuleData {
@@ -254,20 +255,34 @@ export class ModuleService {
   /**
    * Hard delete module (permanently remove from database)
    */
-  async hardDeleteModule(id: number): Promise<void> {
+  async hardDeleteModule(id: number): Promise<{ deletedPermissions: number; moduleName: string }> {
     const module = await Module.findByPk(id);
     if (!module) {
       throw new NotFoundError('Module not found');
     }
 
-    // Check if module has permissions
-    const permissionCount = await Permission.count({ where: { moduleId: id } });
-    if (permissionCount > 0) {
-      throw new ValidationError('Cannot delete module with existing permissions. Delete permissions first.');
+    // Check if module has permissions and delete them first (cascade delete)
+    const permissions = await Permission.findAll({ where: { moduleId: id } });
+    
+    if (permissions.length > 0) {
+      // First, remove all role-permission relationships for these permissions
+      const permissionIds = permissions.map(p => p.get('id') as number);
+      await RolePermission.destroy({ where: { permissionId: permissionIds } });
+      
+      // Then delete all permissions for this module
+      await Permission.destroy({ where: { moduleId: id } });
+      
+      // Log the cascade deletion for audit purposes
+      console.log(`Cascade deleted ${permissions.length} permissions for module ${id}`);
     }
 
     // Hard delete module
     await module.destroy();
+    
+    return {
+      deletedPermissions: permissions.length,
+      moduleName: module.get('name') as string
+    };
   }
 
   /**

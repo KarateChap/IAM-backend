@@ -68,10 +68,10 @@ export const removeRolesFromGroup = async (req: Request, res: Response, next: Ne
     }
 
     const groupId = parseInt(req.params.groupId);
-    const roleId = parseInt(req.params.roleId);
+    const { roleIds } = req.body;
 
     // Use service to handle the removal
-    const result = await groupRoleService.removeRolesFromGroup(groupId, [roleId]);
+    const result = await groupRoleService.removeRolesFromGroup(groupId, roleIds);
 
     // Log audit event
     await auditService.logEvent({

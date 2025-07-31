@@ -297,7 +297,7 @@ describe('User Controller', () => {
       await userController.delete(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockUserService.getUserById).toHaveBeenCalledWith(1);
-      expect(mockUserService.deleteUser).toHaveBeenCalledWith(1);
+      expect(mockUserService.hardDeleteUser).toHaveBeenCalledWith(1);
       expect(mockAuditService.logEvent).toHaveBeenCalledWith({
         userId: 1,
         action: 'delete',
@@ -316,7 +316,7 @@ describe('User Controller', () => {
 
     it('should handle service errors', async () => {
       const serviceError = new Error('Service error');
-      mockUserService.deleteUser.mockRejectedValue(serviceError);
+      mockUserService.hardDeleteUser.mockRejectedValue(serviceError);
 
       await userController.delete(mockRequest as Request, mockResponse as Response, mockNext);
 

@@ -198,20 +198,26 @@ export default class ModuleController {
       // Get module info before deletion for audit log
       const moduleInstance = await moduleService.getModuleById(Number(id));
       
-      await moduleService.hardDeleteModule(Number(id));
+      const deleteResult = await moduleService.hardDeleteModule(Number(id));
       
-      // Log the deletion
+      // Log the deletion with cascade information
       await auditService.logEvent({
         userId: (req as any).user?.id || 0,
         action: 'delete',
         resource: 'Module',
         resourceId: Number(id),
-        details: { message: `Deleted module: ${moduleInstance.name}` }
+        details: { 
+          message: `Deleted module: ${moduleInstance.name}`,
+          cascadeDeleted: deleteResult.deletedPermissions
+        }
       });
 
       res.status(200).json({
         success: true,
-        message: 'Module deleted successfully'
+        message: deleteResult.deletedPermissions > 0 
+          ? `Module deleted successfully with ${deleteResult.deletedPermissions} permissions`
+          : 'Module deleted successfully',
+        data: deleteResult
       });
     } catch (error) {
       next(error);

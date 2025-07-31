@@ -68,10 +68,10 @@ export const removeUsersFromGroup = async (req: Request, res: Response, next: Ne
     }
 
     const groupId = parseInt(req.params.groupId);
-    const userId = parseInt(req.params.userId);
+    const { userIds } = req.body;
 
     // Use service to handle the removal
-    const result = await userGroupService.removeUsersFromGroup(groupId, [userId]);
+    const result = await userGroupService.removeUsersFromGroup(groupId, userIds);
 
     // Log audit event
     await auditService.logEvent({

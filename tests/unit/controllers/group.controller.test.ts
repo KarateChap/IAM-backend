@@ -349,7 +349,7 @@ describe('Group Controller', () => {
 
       await groupController.delete(mockRequest as Request, mockResponse as Response, mockNext);
 
-      expect(mockGroupService.deleteGroup).toHaveBeenCalledWith(1);
+      expect(mockGroupService.hardDeleteGroup).toHaveBeenCalledWith(1);
       expect(mockAuditService.logEvent).toHaveBeenCalledWith({
         userId: 1,
         action: 'GROUP_DELETED',
@@ -382,7 +382,7 @@ describe('Group Controller', () => {
 
     it('should handle service errors', async () => {
       const error = new Error('Service error');
-      mockGroupService.deleteGroup.mockRejectedValue(error);
+      mockGroupService.hardDeleteGroup.mockRejectedValue(error);
 
       await groupController.delete(mockRequest as Request, mockResponse as Response, mockNext);
 

@@ -1,15 +1,18 @@
 import { ModuleService, CreateModuleData, UpdateModuleData, ModuleWithDetails, ModuleFilters } from '../../../src/services/module.service';
 import { Module } from '../../../src/models/module.model';
 import { Permission } from '../../../src/models/permission.model';
+import { RolePermission } from '../../../src/models/rolePermission.model';
 import { NotFoundError, ConflictError, ValidationError } from '../../../src/utils/errors';
 import { Op } from 'sequelize';
 
 // Mock models
 jest.mock('../../../src/models/module.model');
 jest.mock('../../../src/models/permission.model');
+jest.mock('../../../src/models/rolePermission.model');
 
 const MockedModule = Module as jest.Mocked<typeof Module>;
 const MockedPermission = Permission as jest.Mocked<typeof Permission>;
+const MockedRolePermission = RolePermission as jest.Mocked<typeof RolePermission>;
 
 describe('ModuleService', () => {
   let moduleService: ModuleService;
@@ -538,14 +541,15 @@ describe('ModuleService', () => {
     it('should hard delete module successfully', async () => {
       const mockModule = {
         destroy: jest.fn(),
+        get: jest.fn((key: string) => key === 'name' ? 'Test Module' : undefined)
       };
 
       MockedModule.findByPk.mockResolvedValue(mockModule as any);
-      MockedPermission.count.mockResolvedValue(0);
+      MockedPermission.findAll.mockResolvedValue([]);
 
       await moduleService.hardDeleteModule(1);
 
-      expect(MockedPermission.count).toHaveBeenCalledWith({ where: { moduleId: 1 } });
+      expect(MockedPermission.findAll).toHaveBeenCalledWith({ where: { moduleId: 1 } });
       expect(mockModule.destroy).toHaveBeenCalled();
     });
 
@@ -556,18 +560,28 @@ describe('ModuleService', () => {
       await expect(moduleService.hardDeleteModule(999)).rejects.toThrow('Module not found');
     });
 
-    it('should throw ValidationError when module has permissions', async () => {
-      const mockModule = { destroy: jest.fn() };
+    it('should cascade delete module with permissions', async () => {
+      const mockModule = {
+        destroy: jest.fn(),
+        get: jest.fn((key: string) => key === 'name' ? 'Test Module' : undefined)
+      };
+      const mockPermissions = [
+        { get: jest.fn((key: string) => key === 'id' ? 1 : undefined) },
+        { get: jest.fn((key: string) => key === 'id' ? 2 : undefined) }
+      ];
 
       MockedModule.findByPk.mockResolvedValue(mockModule as any);
-      MockedPermission.count.mockResolvedValue(3);
+      MockedPermission.findAll.mockResolvedValue(mockPermissions as any);
+      MockedRolePermission.destroy.mockResolvedValue(2 as any);
+      MockedPermission.destroy.mockResolvedValue(2 as any);
 
-      await expect(moduleService.hardDeleteModule(1)).rejects.toThrow(ValidationError);
-      await expect(moduleService.hardDeleteModule(1)).rejects.toThrow(
-        'Cannot delete module with existing permissions. Delete permissions first.'
-      );
+      const result = await moduleService.hardDeleteModule(1);
 
-      expect(mockModule.destroy).not.toHaveBeenCalled();
+      expect(MockedPermission.findAll).toHaveBeenCalledWith({ where: { moduleId: 1 } });
+      expect(MockedRolePermission.destroy).toHaveBeenCalledWith({ where: { permissionId: [1, 2] } });
+      expect(MockedPermission.destroy).toHaveBeenCalledWith({ where: { moduleId: 1 } });
+      expect(mockModule.destroy).toHaveBeenCalled();
+      expect(result).toEqual({ deletedPermissions: 2, moduleName: 'Test Module' });
     });
   });
 

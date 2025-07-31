@@ -392,13 +392,13 @@ describe('Role Controller', () => {
         groupCount: 0
       };
       mockRoleService.getRoleById.mockResolvedValue(mockRole);
-      mockRoleService.deleteRole.mockResolvedValue(undefined);
+      mockRoleService.hardDeleteRole.mockResolvedValue(undefined);
       mockAuditService.logEvent.mockResolvedValue(undefined);
 
       await roleController.delete(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockRoleService.getRoleById).toHaveBeenCalledWith(1);
-      expect(mockRoleService.deleteRole).toHaveBeenCalledWith(1);
+      expect(mockRoleService.hardDeleteRole).toHaveBeenCalledWith(1);
       expect(mockAuditService.logEvent).toHaveBeenCalledWith({
         userId: 1,
         action: 'delete',

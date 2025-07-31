@@ -155,7 +155,7 @@ describe('AuditService', () => {
   describe('getAuditLogs', () => {
     beforeEach(async () => {
       // Clear any existing logs
-      await auditService.getAuditLogs(); // This will reset the internal state
+      auditService.clearLogs();
       
       // Add test logs with specific timestamps
       const createEvent = {

@@ -87,6 +87,13 @@ export class AuditService {
   }
 
   /**
+   * Clear all audit logs (for testing purposes)
+   */
+  clearLogs(): void {
+    this.auditLogs = [];
+  }
+
+  /**
    * Get audit logs with filtering
    */
   async getAuditLogs(filters: {

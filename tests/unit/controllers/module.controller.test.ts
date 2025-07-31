@@ -377,24 +377,31 @@ describe('Module Controller', () => {
         permissionCount: 0
       };
       mockModuleService.getModuleById.mockResolvedValue(mockModule);
-      mockModuleService.deleteModule.mockResolvedValue(undefined);
+      mockModuleService.hardDeleteModule.mockResolvedValue({ deletedPermissions: 0, moduleName: 'Test Module' });
       mockAuditService.logEvent.mockResolvedValue(undefined);
 
       await moduleController.delete(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockModuleService.getModuleById).toHaveBeenCalledWith(1);
-      expect(mockModuleService.deleteModule).toHaveBeenCalledWith(1);
+      expect(mockModuleService.hardDeleteModule).toHaveBeenCalledWith(1);
       expect(mockAuditService.logEvent).toHaveBeenCalledWith({
         userId: 1,
         action: 'delete',
         resource: 'Module',
         resourceId: 1,
-        details: { message: 'Deleted module: Test Module' }
+        details: { 
+          message: 'Deleted module: Test Module',
+          cascadeDeleted: 0
+        }
       });
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
-        message: 'Module deleted successfully'
+        message: 'Module deleted successfully',
+        data: {
+          deletedPermissions: 0,
+          moduleName: 'Test Module'
+        }
       });
     });
 
